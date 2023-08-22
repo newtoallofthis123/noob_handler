@@ -17,3 +17,4 @@ inquire = {version = "*", default-features = false, features=["crossterm", "date
 human-panic = "1.1.5"
 mongodb = {version="*", features = ["tokio-sync"], default-features = false}
 dotenv = {version="*"}
+rand = {version="*"}

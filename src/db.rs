@@ -80,5 +80,26 @@ pub async fn get_code(hash: &str)->Code{
     let db = get_db().await.unwrap();
     let collection = db.collection::<Code>("code");
     let result = collection.find_one(doc! {"hash": hash}, None).await.unwrap();
-    result.expect("Page Not Found")
+    result.expect("Code Not Found")
+}
+
+pub async fn update_code(hash: &str, code:&Code)->mongodb::results::UpdateResult{
+    let db = get_db().await.unwrap();
+    let collection = db.collection::<Code>("code");
+    let result = collection.update_one(doc! {"hash": hash}, doc! {"$set": 
+        {
+            "title": &code.title,
+            "content": &code.content,
+            "lang": &code.lang,
+            "author": &code.author,
+        }
+}, None).await.unwrap();
+    result
+}
+
+pub async fn insert_code(code:&Code)->mongodb::results::InsertOneResult{
+    let db = get_db().await.unwrap();
+    let collection = db.collection::<Code>("code");
+    let result = collection.insert_one(code.clone(), None).await.unwrap();
+    result
 }

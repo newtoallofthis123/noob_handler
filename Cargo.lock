@@ -707,6 +707,7 @@ dependencies = [
  "human-panic",
  "inquire",
  "mongodb",
+ "rand",
  "reqwest",
  "serde",
  "serde_json",
