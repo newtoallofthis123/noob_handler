@@ -1,4 +1,6 @@
 use rand::Rng;
+use clipboard::ClipboardProvider;
+use clipboard::ClipboardContext;
 
 pub fn get_mongo_url()->String{
     let mongo_url = std::env::var("MONGODB_URL").expect("MONGODB_URL not set");
@@ -14,7 +16,7 @@ pub fn random_hash()->String{
     let mut rng = rand::thread_rng();
     let rand_string: String = std::iter::repeat(())
         .map(|()| rng.sample(rand::distributions::Alphanumeric) as char)
-        .take(8)
+        .take(6)
         .collect();
     rand_string
 }
@@ -37,4 +39,9 @@ pub fn match_lang(lang: &str)->String{
         "css" => String::from(".css"),
         _ => String::from(".txt"),
     }
+}
+
+pub fn copy(msg: &str){
+    let mut board: ClipboardContext = ClipboardProvider::new().unwrap();
+    board.set_contents(msg.to_owned()).unwrap();
 }

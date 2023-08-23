@@ -1,4 +1,4 @@
-use crate::{db::{Page, Code}, utils::match_lang};
+use crate::{db::{Page, Code, Go}, utils::{match_lang, random_hash}};
 
 pub fn get_text(msg: &str, help_msg: &str)->String{
     let question = inquire::Text::new(msg);
@@ -14,13 +14,9 @@ pub fn get_option(options: Vec<&str>)->String{
 }
 
 pub fn get_confirmation(msg: &str)->bool{
-    let question = inquire::Confirm::new(msg);
+    let question = inquire::Confirm::new(msg).with_default(true);
     let answer = question.prompt().unwrap();
     answer
-}
-
-pub fn print_title(title: &str){
-    bunt::println!("In {$bold}{$blue}{$underline}{}{/$}{/$}{/$}", title);
 }
 
 pub fn ask_page(page: &Page)->Page{
@@ -42,25 +38,26 @@ pub fn ask_page(page: &Page)->Page{
 }
 
 pub fn display_page(page: &Page){
-    bunt::println!("##############################");
     bunt::println!("Showing Page: {$blue}{$underline}{}{/$}{/$}", page.name);
     bunt::println!("With Name: {$green}{}{/$}", page.name);
     bunt::println!("Written on {$yellow}{}{/$}", page.date);
     bunt::println!("Author: {$cyan}{}{/$}", page.author);
     bunt::println!("------------------------------");
     bunt::println!("{}", page.content);
-    bunt::println!("##############################");
 }
 
 pub fn display_code(code: &Code){
-    bunt::println!("##############################");
     bunt::println!("Showing Code Snippet: {$blue}{$underline}{}{/$}{/$}", code.title);
     bunt::println!("Written by {$yellow}{}{/$}", code.author);
     bunt::println!("Language: {$cyan}{}{/$}", code.lang);
     bunt::println!("------------------------------");
     bunt::println!("Opening Code In Editor with language {}...Changing it won't change the actual code", code.lang);
     let _content = inquire::Editor::new("Content").with_file_extension(match_lang(&code.lang).as_str()).with_editor_command(std::ffi::OsStr::new("vim")).with_predefined_text(code.content.as_str()).prompt().unwrap();
-    bunt::println!("##############################");
+}
+
+pub fn display_go(go:&Go){
+    bunt::println!("Showing Go with hash: {$blue}{$underline}{}{/$}{/$}", go.slug);
+    bunt::println!("With URL: {$green}{}{/$}", go.url);
 }
 
 pub fn ask_code(code: &Code)->Code{
@@ -79,4 +76,29 @@ pub fn ask_code(code: &Code)->Code{
         lang,
     };
     code_doc
+}
+
+pub fn ask_go(go: &Go)->Go{
+    println!("{}", format!("Editing {}", go.slug).as_str());
+    let slug = inquire::Text::new("Slug").with_default(go.slug.as_str()).prompt().unwrap();
+    let url = inquire::Text::new("URL").with_default(go.url.as_str()).prompt().unwrap();
+    
+    let go_doc = Go{
+        _id: go._id.clone(),
+        slug,
+        url,
+    };
+    go_doc
+}
+
+pub fn ask_new_go()->Go{
+    let slug = inquire::Text::new("Slug").with_default(random_hash().as_str()).prompt().unwrap();
+    let url = inquire::Text::new("URL").prompt().unwrap();
+    
+    let go_doc = Go{
+        _id: mongodb::bson::oid::ObjectId::new(),
+        slug,
+        url,
+    };
+    go_doc
 }

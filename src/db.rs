@@ -5,9 +5,9 @@ use mongodb::bson::oid::ObjectId;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Go {
-    _id: ObjectId,
-    slug: String,
-    url: String,
+    pub _id: ObjectId,
+    pub slug: String,
+    pub url: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -122,8 +122,29 @@ pub async fn delete_code(hash: &str)->mongodb::results::DeleteResult{
 }
 
 pub async fn get_go(slug: &str)->Go{
-    let db = get_db().await.unwrap();
-    let collection = db.collection::<Go>("go");
+    let collection = get_go_conn().await;
     let result = collection.find_one(doc! {"slug": slug}, None).await.unwrap();
     result.unwrap()
+}
+
+pub async fn update_go(slug: &str, go:&Go)->mongodb::results::UpdateResult{
+    let collection = get_go_conn().await;
+    let result = collection.update_one(doc! {"slug": slug}, doc! {"$set": 
+        {
+            "url": &go.url,
+        }
+}, None).await.unwrap();
+    result
+}
+
+pub async fn insert_go(go:&Go)->mongodb::results::InsertOneResult{
+    let collection = get_go_conn().await;
+    let result = collection.insert_one(go.clone(), None).await.unwrap();
+    result
+}
+
+pub async fn delete_go(slug: &str)->mongodb::results::DeleteResult{
+    let collection = get_go_conn().await;
+    let result = collection.delete_one(doc! {"slug": slug}, None).await.unwrap();
+    result
 }
