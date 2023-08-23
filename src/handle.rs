@@ -37,21 +37,6 @@ pub async fn pages(hash:&str){
     }
 }
 
-pub async fn new(doc:&str){
-    match doc {
-        "page" => {
-            new_page().await;            
-        },
-        "code" => {
-            new_code().await;
-        }
-        "go" => {
-            new_go().await;
-        }
-        _ => println!("Invalid Option"),
-    }
-}
-
 pub async fn code(hash: &str){
     bunt::println!("Currently in Code: {$cyan}{}{/$}", hash);
     let code_doc = db::get_code(&hash).await;
@@ -189,5 +174,55 @@ pub async fn new_go(){
     }
     else{
         bunt::println!("{$red}Aborted{/$}");
+    }
+}
+
+pub async fn new(doc:&str){
+    match doc {
+        "page" => {
+            new_page().await;            
+        },
+        "code" => {
+            new_code().await;
+        }
+        "go" => {
+            new_go().await;
+        }
+        _ => println!("Invalid Option"),
+    }
+}
+
+pub async fn list_pages(){
+    let pages_vec = db::get_all_pages().await;
+    let title_list:Vec<String> = pages_vec.iter().map(|page| page.name.clone()).collect();
+    //convert vec<String> to vec<&str>
+    let title_list:Vec<&str> = title_list.iter().map(|title| title.as_str()).collect();
+    let option = cli::get_option(title_list);
+    let page = pages_vec.iter().find(|page| page.name == option).unwrap();
+    pages(page.hash.as_str()).await;
+}
+
+pub async fn list_codes(){
+    let pages_vec = db::get_all_codes().await;
+    let title_list:Vec<String> = pages_vec.iter().map(|page| page.title.clone()).collect();
+    //convert vec<String> to vec<&str>
+    let title_list:Vec<&str> = title_list.iter().map(|title| title.as_str()).collect();
+    let option = cli::get_option(title_list);
+    let page = pages_vec.iter().find(|page| page.title == option).unwrap();
+    code(page.hash.as_str()).await;
+}
+
+pub async fn list(collection:&str){
+    match collection {
+        "pages" => {
+            list_pages().await;
+        },
+        "code" => {
+            list_codes().await;
+        },
+        "go" => {
+            bunt::println!("Not Implemented Yet");
+        }
+        _ => println!("Invalid Option"),
     }
 }

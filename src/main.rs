@@ -45,6 +45,7 @@ async fn main() {
     }
     match option.as_str() {
         "new" => handle::new(&hash).await,
+        "list" => handle::list(&hash).await,
         "pages" => handle::pages(&hash).await,
         "code" => handle::code(&hash).await,
         "go" => handle::go(&hash).await,

@@ -8,7 +8,7 @@ pub fn get_text(msg: &str, help_msg: &str)->String{
 }
 
 pub fn get_option(options: Vec<&str>)->String{
-    let question = inquire::Select::new("Select an option", options);
+    let question = inquire::Select::new("Select an option", options).with_page_size(20);
     let answer = question.prompt().unwrap().to_string();
     answer
 }

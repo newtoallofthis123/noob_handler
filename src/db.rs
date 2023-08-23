@@ -1,4 +1,5 @@
-use mongodb::{Client, bson::doc};
+use futures::StreamExt;
+use mongodb::{Client, bson::doc, options::FindOptions};
 use serde::{Deserialize, Serialize};
 use crate::utils::get_mongo_url;
 use mongodb::bson::oid::ObjectId;
@@ -147,4 +148,37 @@ pub async fn delete_go(slug: &str)->mongodb::results::DeleteResult{
     let collection = get_go_conn().await;
     let result = collection.delete_one(doc! {"slug": slug}, None).await.unwrap();
     result
+}
+
+pub async fn get_all_pages()->Vec<Page>{
+    let collection = get_page_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
+}
+
+pub async fn get_all_codes()->Vec<Code>{
+    let collection = get_code_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
+}
+
+pub async fn _get_all_go()->Vec<Go>{
+    let collection = get_go_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
 }
