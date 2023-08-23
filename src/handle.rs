@@ -21,6 +21,16 @@ pub async fn pages(hash:&str){
                 bunt::println!("{$red}Aborted{/$}");
             }
         },
+        "Delete" => {
+            let confirmation = cli::get_confirmation("Are you sure you want to delete this page?");
+            if confirmation {
+                db::delete_page(hash).await;
+                bunt::println!("Deleted {$green}{}{/$}", page.name);
+            }
+            else{
+                bunt::println!("{$red}Aborted{/$}");
+            }
+        },
         _ => println!("Invalid Option"),
     }
 }
@@ -34,29 +44,6 @@ pub async fn new(doc:&str){
             new_code().await;
         }
         _ => println!("Invalid Option"),
-    }
-}
-
-pub async fn new_page(){
-    let page:Page = Page{
-        _id: mongodb::bson::oid::ObjectId::new(),
-        hash: String::from(""),
-        name: String::from(""),
-        content: String::from(""),
-        date: String::from(""),
-        author: String::from(""),
-    };
-    let mut edited_page = cli::ask_page(&page);
-    bunt::println!("Edited Page: {$green}{}{/$}", edited_page.name);
-    edited_page.hash = crate::utils::title_to_hash(&edited_page.name);
-    cli::display_page(&edited_page);
-    let confirmation = cli::get_confirmation("Are you sure you want to commit this page?");
-    if confirmation {
-        db::insert_page(&edited_page).await;
-        bunt::println!("Updated {$green}{}{/$}", edited_page.name);
-    }
-    else{
-        bunt::println!("{$red}Aborted{/$}");
     }
 }
 
@@ -80,8 +67,41 @@ pub async fn code(hash: &str){
                 bunt::println!("{$red}Aborted{/$}");
             }
         },
+        "Delete" => {
+            let confirmation = cli::get_confirmation("Are you sure you want to delete this page?");
+            if confirmation {
+                db::delete_code(hash).await;
+                bunt::println!("Deleted {$green}{}{/$}", code_doc.title);
+            }
+            else{
+                bunt::println!("{$red}Aborted{/$}");
+            }
+        },
         _ => println!("Invalid Option"),
     }   
+}
+
+pub async fn new_page(){
+    let page:Page = Page{
+        _id: mongodb::bson::oid::ObjectId::new(),
+        hash: String::from(""),
+        name: String::from(""),
+        content: String::from(""),
+        date: String::from(""),
+        author: String::from(""),
+    };
+    let mut edited_page = cli::ask_page(&page);
+    bunt::println!("Edited Page: {$green}{}{/$}", edited_page.name);
+    edited_page.hash = crate::utils::title_to_hash(&edited_page.name);
+    cli::display_page(&edited_page);
+    let confirmation = cli::get_confirmation("Are you sure you want to commit this page?");
+    if confirmation {
+        db::insert_page(&edited_page).await;
+        bunt::println!("Updated {$green}{}{/$}", edited_page.name);
+    }
+    else{
+        bunt::println!("{$red}Aborted{/$}");
+    }
 }
 
 pub async fn new_code(){
