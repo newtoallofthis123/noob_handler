@@ -1,4 +1,4 @@
-use crate::{cli, db::{self, Page, Code}, utils};
+use crate::{cli, db::{self, Page, Code, Specials}, utils};
 
 pub async fn pages(hash:&str){
     bunt::println!("Currently in Page: {$cyan}{}{/$}", hash);
@@ -127,7 +127,7 @@ pub async fn new_page(){
     if confirmation {
         db::insert_page(&edited_page).await;
         bunt::println!("Updated {$green}{}{/$}", edited_page.name);
-        utils::copy(format!("https://noobscience.rocks/page/{}", edited_page.hash).as_str());
+        utils::copy(format!("https://noobscience.rocks/quips/{}", edited_page.hash).as_str());
         bunt::println!("Copied URL to clipboard");
     }
     else{
@@ -179,7 +179,7 @@ pub async fn new_go(){
 
 pub async fn new(doc:&str){
     match doc {
-        "page" => {
+        "pages" => {
             new_page().await;            
         },
         "code" => {
@@ -224,5 +224,34 @@ pub async fn list(collection:&str){
             bunt::println!("Not Implemented Yet");
         }
         _ => println!("Invalid Option"),
+    }
+}
+
+pub async fn set(thing:&str){
+    let mut special:Specials = db::get_specials().await;
+    match thing{
+        "current" => {
+            let current = cli::get_editor("Current", special.current);
+            special.current = current;
+        },
+        "title" => {
+            let title = cli::get_text("Title", "What are you up to?");
+            special.title = title;
+        },
+        "description" => {
+            let description = cli::get_editor("Description", special.description);
+            special.description = description;
+            let date = cli::get_text("Date", "When did you start this?");
+            special.date = date;
+        },
+        _ => println!("Invalid Option"),
+    }
+    let confirmation = cli::get_confirmation("Are you sure you want to commit this page?");
+    if confirmation {
+        db::set_specials(&special).await;
+        bunt::println!("Updated {$green}{}{/$}", thing);
+    }
+    else{
+        bunt::println!("{$red}Aborted{/$}");
     }
 }

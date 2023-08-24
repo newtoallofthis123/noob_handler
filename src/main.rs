@@ -1,5 +1,6 @@
 use clap::Parser;
 use dotenv::dotenv;
+use human_panic::setup_panic;
 
 // CLI Config handled through the use of the clap crate
 #[derive(Parser, Debug)]
@@ -7,7 +8,7 @@ use dotenv::dotenv;
 
 // The Args struct is used to parse the command line arguments
 struct Args {
-    #[arg(required=true)]
+    #[arg(required=true, help="The option you want to use")]
     option: String,
 
     #[arg(required=false)]
@@ -29,6 +30,8 @@ mod db;
 async fn main() {
     // For automatically loading the .env file
     dotenv().ok();
+    // For automatically setting up the panic handler
+    setup_panic!();
     bunt::println!("{$blue} _   _             _     _   _                 _ _           {/$}");
     bunt::println!("{$yellow}| \\ | | ___   ___ | |__ | | | | __ _ _ __   __| | | ___ _ __ {/$}");
     bunt::println!("{$red}|  \\| |/ _ \\ / _ \\| '_ \\| |_| |/ _` | '_ \\ / _` | |/ _ \\ '__|{/$}");
@@ -44,6 +47,7 @@ async fn main() {
         hash = cli::get_text("Page Hash", "Enter The Hash of the page you want to edit");
     }
     match option.as_str() {
+        "set" => handle::set(&hash).await,
         "new" => handle::new(&hash).await,
         "list" => handle::list(&hash).await,
         "pages" => handle::pages(&hash).await,
