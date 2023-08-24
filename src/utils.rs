@@ -7,6 +7,11 @@ pub fn get_mongo_url()->String{
     mongo_url
 }
 
+pub fn get_md_url()->String{
+    let path = "C:\\Users\\joshi\\Projects\\About_astro_new\\src\\content\\blog\\drafts";
+    path.to_string()
+}
+
 pub fn title_to_hash(title: &str)->String{
     let hash = title.to_lowercase().replace(" ", "-").to_lowercase();
     hash
