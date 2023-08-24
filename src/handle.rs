@@ -1,4 +1,4 @@
-use crate::{cli, db::{self, Page, Code}, utils};
+use crate::{cli, db::{self, Page, Code, Specials}, utils};
 
 pub async fn pages(hash:&str){
     bunt::println!("Currently in Page: {$cyan}{}{/$}", hash);
@@ -33,21 +33,6 @@ pub async fn pages(hash:&str){
                 bunt::println!("{$red}Aborted{/$}");
             }
         },
-        _ => println!("Invalid Option"),
-    }
-}
-
-pub async fn new(doc:&str){
-    match doc {
-        "page" => {
-            new_page().await;            
-        },
-        "code" => {
-            new_code().await;
-        }
-        "go" => {
-            new_go().await;
-        }
         _ => println!("Invalid Option"),
     }
 }
@@ -142,7 +127,7 @@ pub async fn new_page(){
     if confirmation {
         db::insert_page(&edited_page).await;
         bunt::println!("Updated {$green}{}{/$}", edited_page.name);
-        utils::copy(format!("https://noobscience.rocks/page/{}", edited_page.hash).as_str());
+        utils::copy(format!("https://noobscience.rocks/quips/{}", edited_page.hash).as_str());
         bunt::println!("Copied URL to clipboard");
     }
     else{
@@ -186,6 +171,85 @@ pub async fn new_go(){
         bunt::println!("Added {$green}{}{/$}", edited_go.slug);
         utils::copy(format!("https://noobscience.rocks/go/{}", edited_go.slug).as_str());
         bunt::println!("Copied URL to clipboard");
+    }
+    else{
+        bunt::println!("{$red}Aborted{/$}");
+    }
+}
+
+pub async fn new(doc:&str){
+    match doc {
+        "pages" => {
+            new_page().await;            
+        },
+        "code" => {
+            new_code().await;
+        }
+        "go" => {
+            new_go().await;
+        }
+        _ => println!("Invalid Option"),
+    }
+}
+
+pub async fn list_pages(){
+    let pages_vec = db::get_all_pages().await;
+    let title_list:Vec<String> = pages_vec.iter().map(|page| page.name.clone()).collect();
+    //convert vec<String> to vec<&str>
+    let title_list:Vec<&str> = title_list.iter().map(|title| title.as_str()).collect();
+    let option = cli::get_option(title_list);
+    let page = pages_vec.iter().find(|page| page.name == option).unwrap();
+    pages(page.hash.as_str()).await;
+}
+
+pub async fn list_codes(){
+    let pages_vec = db::get_all_codes().await;
+    let title_list:Vec<String> = pages_vec.iter().map(|page| page.title.clone()).collect();
+    //convert vec<String> to vec<&str>
+    let title_list:Vec<&str> = title_list.iter().map(|title| title.as_str()).collect();
+    let option = cli::get_option(title_list);
+    let page = pages_vec.iter().find(|page| page.title == option).unwrap();
+    code(page.hash.as_str()).await;
+}
+
+pub async fn list(collection:&str){
+    match collection {
+        "pages" => {
+            list_pages().await;
+        },
+        "code" => {
+            list_codes().await;
+        },
+        "go" => {
+            bunt::println!("Not Implemented Yet");
+        }
+        _ => println!("Invalid Option"),
+    }
+}
+
+pub async fn set(thing:&str){
+    let mut special:Specials = db::get_specials().await;
+    match thing{
+        "current" => {
+            let current = cli::get_editor("Current", special.current);
+            special.current = current;
+        },
+        "title" => {
+            let title = cli::get_text("Title", "What are you up to?");
+            special.title = title;
+        },
+        "description" => {
+            let description = cli::get_editor("Description", special.description);
+            special.description = description;
+            let date = cli::get_text("Date", "When did you start this?");
+            special.date = date;
+        },
+        _ => println!("Invalid Option"),
+    }
+    let confirmation = cli::get_confirmation("Are you sure you want to commit this page?");
+    if confirmation {
+        db::set_specials(&special).await;
+        bunt::println!("Updated {$green}{}{/$}", thing);
     }
     else{
         bunt::println!("{$red}Aborted{/$}");

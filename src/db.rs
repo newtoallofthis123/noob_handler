@@ -1,4 +1,5 @@
-use mongodb::{Client, bson::doc};
+use futures::StreamExt;
+use mongodb::{Client, bson::doc, options::FindOptions};
 use serde::{Deserialize, Serialize};
 use crate::utils::get_mongo_url;
 use mongodb::bson::oid::ObjectId;
@@ -30,6 +31,16 @@ pub struct Code{
     pub author: String,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Specials{
+    pub _id: ObjectId,
+    pub tag: String,
+    pub title: String,
+    pub description: String,
+    pub current: String,
+    pub date: String,
+}
+
 async fn get_connection() -> Result<Client, mongodb::error::Error> {
     let client = Client::with_uri_str(get_mongo_url()).await?;
     Ok(client)
@@ -56,6 +67,12 @@ async fn get_code_conn()->mongodb::Collection<Code>{
 async fn get_go_conn()->mongodb::Collection<Go>{
     let db = get_db().await.unwrap();
     let collection = db.collection::<Go>("go");
+    collection
+}
+
+async fn get_specials_conn()->mongodb::Collection<Specials>{
+    let db = get_db().await.unwrap();
+    let collection = db.collection::<Specials>("specials");
     collection
 }
 
@@ -146,5 +163,57 @@ pub async fn insert_go(go:&Go)->mongodb::results::InsertOneResult{
 pub async fn delete_go(slug: &str)->mongodb::results::DeleteResult{
     let collection = get_go_conn().await;
     let result = collection.delete_one(doc! {"slug": slug}, None).await.unwrap();
+    result
+}
+
+pub async fn get_all_pages()->Vec<Page>{
+    let collection = get_page_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
+}
+
+pub async fn get_all_codes()->Vec<Code>{
+    let collection = get_code_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
+}
+
+pub async fn _get_all_go()->Vec<Go>{
+    let collection = get_go_conn().await;
+    let find_options = FindOptions::builder().build();
+    let mut result = collection.find(None, find_options).await.unwrap();
+    let mut result_vec = Vec::new();
+    while let Some(doc) = result.next().await {
+        result_vec.push(doc.expect("Failed to push"));
+    }
+    result_vec
+}
+
+pub async fn get_specials()->Specials{
+    let collection = get_specials_conn().await;
+    let result = collection.find_one(doc! {"tag": "special"}, None).await.unwrap();
+    result.expect("Specials Not Found")
+}
+
+pub async fn set_specials(special:&Specials)->mongodb::results::UpdateResult{
+    let collection = get_specials_conn().await;
+    let result = collection.update_one(doc! {"tag": "special"}, doc! {"$set": 
+        {
+            "title": &special.title,
+            "description": &special.description,
+            "current": &special.current,
+            "date": &special.date,
+        }
+}, None).await.unwrap();
     result
 }

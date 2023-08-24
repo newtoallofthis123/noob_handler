@@ -8,7 +8,7 @@ pub fn get_text(msg: &str, help_msg: &str)->String{
 }
 
 pub fn get_option(options: Vec<&str>)->String{
-    let question = inquire::Select::new("Select an option", options);
+    let question = inquire::Select::new("Select an option", options).with_page_size(20);
     let answer = question.prompt().unwrap().to_string();
     answer
 }
@@ -19,10 +19,15 @@ pub fn get_confirmation(msg: &str)->bool{
     answer
 }
 
+pub fn get_editor(msg:&str, pre_content:String)->String{
+    let content = inquire::Editor::new(msg).with_file_extension(".md").with_editor_command(std::ffi::OsStr::new("micro")).with_predefined_text(pre_content.as_str()).prompt().unwrap();
+    content
+}
+
 pub fn ask_page(page: &Page)->Page{
     println!("{}", format!("Editing {}", page.name).as_str());
     let name = inquire::Text::new("Name").with_default(page.name.as_str()).prompt().unwrap();
-    let content = inquire::Editor::new("Content").with_file_extension(".md").with_editor_command(std::ffi::OsStr::new("vim")).with_predefined_text(page.content.as_str()).prompt().unwrap();
+    let content = inquire::Editor::new("Content").with_file_extension(".md").with_editor_command(std::ffi::OsStr::new("micro")).with_predefined_text(page.content.as_str()).prompt().unwrap();
     let author = inquire::Text::new("Author").with_default(page.author.as_str()).prompt().unwrap();
     let date = inquire::Text::new("Date").with_default(page.date.as_str()).prompt().unwrap();
     
