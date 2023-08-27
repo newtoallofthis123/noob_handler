@@ -1,4 +1,5 @@
 use crate::{cli, db::{self, Page, Code, Specials}, utils};
+use std::io::Write;
 
 pub async fn pages(hash:&str){
     bunt::println!("Currently in Page: {$cyan}{}{/$}", hash);
@@ -253,5 +254,69 @@ pub async fn set(thing:&str){
     }
     else{
         bunt::println!("{$red}Aborted{/$}");
+    }
+}
+
+pub async fn md(hash:&str){
+    bunt::println!("New Markdown File");
+    let md_url = utils::get_md_url();
+    let md_path = format!("{}\\{}.mdx", md_url, hash);
+    let mut file = std::fs::File::create(md_path).expect("Unable to create file");
+    let title = cli::get_text("Title", "Title of the post");
+    let date = cli::get_text("Date", "Date of the post");
+    let author = "Ishan".to_string();
+    let emoji = cli::get_text("Emoji", "Emoji of the post");
+    let category = cli::get_text("Category", "Category of the post");
+    let tags = cli::get_text("Tags", "Tags of the post");
+    let post_type = cli::get_text("Type", "Type of the post");
+    let bg = inquire::Text::new("Bg of the post").with_default("#fff").prompt().unwrap();
+    let fg = inquire::Text::new("Fg of the post").with_default("#000").prompt().unwrap();
+    let selection_color = inquire::Text::new("Selection Color of the post").with_default("#fff").prompt().unwrap();
+    let selection_bg = inquire::Text::new("Code Bg of the post").with_default("#000").prompt().unwrap();
+    let full_img = inquire::Text::new("Full Image").with_default("false").prompt().unwrap();
+    let full_img = full_img.parse::<bool>().unwrap();
+    let full_img = full_img.to_string();
+
+    let content = format!("---\ntitle: {}\ndate: {}\nauthor: {}\nemoji: {}\nlayout: '../../../layouts/blog_post.astro'\ncategory: {}\ntags: {}\ntype: {}\nbg: {}\nfg: {}\nselection_color: {}\nselection_bg: {}\nfull_img: {}\n---\n", title, date, author, emoji, category, tags, post_type, bg, fg, selection_color, selection_bg, full_img);
+    file.write_all(content.as_bytes()).expect("Unable to write data");
+    bunt::println!("Created {$green}{}{/$}", title);
+}
+
+//check website speed
+use reqwest::Client;
+use std::time::Instant;
+
+pub async fn speed(url: &str) -> () {
+    let final_url:String;
+    if url.starts_with("http://") || url.starts_with("https://") {
+        bunt::println!("Checking Speed of {$cyan}{}{/$}", url);
+        final_url = url.to_string();
+    } else {
+        bunt::println!("Checking Speed of {$cyan}{}{/$}", format!("https://{}", url));
+        final_url = format!("https://{}", url).to_string();
+    }
+    let client = Client::new();
+    let start = Instant::now();
+    let res = client.get(final_url).send().await.unwrap();
+    let duration = start.elapsed();
+    let content_length = res.content_length().unwrap_or(0);
+    let status = res.status();
+    if duration.as_secs() > 0 {
+        bunt::println!("Response Time: {$yellow}{}s{/$}", duration.as_secs());
+    } else {
+        bunt::println!("Response Time: {$green}{}ms{/$}", duration.as_millis());
+    }
+    if content_length < 10 {
+        bunt::println!("Page Size: {$yellow}{} bytes{/$}", content_length);
+    } else {
+        bunt::println!("Page Size: {$green}{} bytes{/$}", content_length);
+    }
+    let duration_secs = duration.as_secs_f64();
+    let duration_rounded = (duration_secs * 100.0).round() / 100.0;
+    println!("Page Load Time: {:.2}s", duration_rounded);
+    if status.is_success() {
+        bunt::println!("Status: {$green}{}{/$}", status);
+    } else {
+        bunt::println!("Status: {$red}{}{/$}", status);
     }
 }
