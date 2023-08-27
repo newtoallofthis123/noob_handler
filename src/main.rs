@@ -54,6 +54,7 @@ async fn main() {
         "code" => handle::code(&hash).await,
         "go" => handle::go(&hash).await,
         "md" => handle::md(&hash).await,
+        "speed" => handle::speed(&hash).await,
         _ => println!("Invalid Option"),
     }
 }

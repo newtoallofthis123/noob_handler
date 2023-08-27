@@ -281,3 +281,42 @@ pub async fn md(hash:&str){
     file.write_all(content.as_bytes()).expect("Unable to write data");
     bunt::println!("Created {$green}{}{/$}", title);
 }
+
+//check website speed
+use reqwest::Client;
+use std::time::Instant;
+
+pub async fn speed(url: &str) -> () {
+    let final_url:String;
+    if url.starts_with("http://") || url.starts_with("https://") {
+        bunt::println!("Checking Speed of {$cyan}{}{/$}", url);
+        final_url = url.to_string();
+    } else {
+        bunt::println!("Checking Speed of {$cyan}{}{/$}", format!("https://{}", url));
+        final_url = format!("https://{}", url).to_string();
+    }
+    let client = Client::new();
+    let start = Instant::now();
+    let res = client.get(final_url).send().await.unwrap();
+    let duration = start.elapsed();
+    let content_length = res.content_length().unwrap_or(0);
+    let status = res.status();
+    if duration.as_secs() > 0 {
+        bunt::println!("Response Time: {$yellow}{}s{/$}", duration.as_secs());
+    } else {
+        bunt::println!("Response Time: {$green}{}ms{/$}", duration.as_millis());
+    }
+    if content_length < 10 {
+        bunt::println!("Page Size: {$yellow}{} bytes{/$}", content_length);
+    } else {
+        bunt::println!("Page Size: {$green}{} bytes{/$}", content_length);
+    }
+    let duration_secs = duration.as_secs_f64();
+    let duration_rounded = (duration_secs * 100.0).round() / 100.0;
+    println!("Page Load Time: {:.2}s", duration_rounded);
+    if status.is_success() {
+        bunt::println!("Status: {$green}{}{/$}", status);
+    } else {
+        bunt::println!("Status: {$red}{}{/$}", status);
+    }
+}
