@@ -163,9 +163,8 @@ pub async fn new_code(){
 
 pub async fn new_go(){
     bunt::println!("Initializing New Go");
-    let mut edited_go = cli::ask_new_go();
+    let edited_go = cli::ask_new_go();
     bunt::println!("Initialized Go: {$green}{}{/$}", edited_go.slug);
-    edited_go.slug = crate::utils::random_hash();
     let confirmation = cli::get_confirmation("Are you sure you want to commit this page?");
     if confirmation {
         db::insert_go(&edited_go).await;

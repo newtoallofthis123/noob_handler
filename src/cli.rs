@@ -69,7 +69,7 @@ pub fn ask_code(code: &Code)->Code{
     println!("{}", format!("Editing {}", code.title).as_str());
     let title = inquire::Text::new("Title").with_default(code.title.as_str()).prompt().unwrap();
     let lang = inquire::Text::new("Lang").with_default(code.lang.as_str()).prompt().unwrap();
-    let content = inquire::Editor::new("Content").with_file_extension(&match_lang(&lang)).with_editor_command(std::ffi::OsStr::new("vim")).with_predefined_text(code.content.as_str()).prompt().unwrap();
+    let content: String = inquire::Editor::new("Content").with_file_extension(&match_lang(&lang)).with_editor_command(std::ffi::OsStr::new("vim")).with_predefined_text(code.content.as_str()).prompt().unwrap();
     let author = inquire::Text::new("Author").with_default(code.author.as_str()).prompt().unwrap();
     
     let code_doc = Code{
