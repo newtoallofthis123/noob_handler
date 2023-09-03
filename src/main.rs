@@ -41,11 +41,16 @@ async fn main() {
     let args = get_args();
     let option = args.option;
     let hash;
+    // We check if the user has actually given the hash as an argument
     if args.hash.is_some() {
         hash = args.hash.unwrap();
     } else {
+        // I don't like to impose arguments on the user, so we ask for the hash if it is not given
         hash = cli::get_text("Page Hash", "Enter The Hash of the page you want to edit");
     }
+    // We match the option given by the user and call the appropriate function
+    // Match functions rock in Rust
+    // We use the handle module to handle the different options
     match option.as_str() {
         "set" => handle::set(&hash).await,
         "new" => handle::new(&hash).await,
