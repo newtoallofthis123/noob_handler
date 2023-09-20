@@ -1,5 +1,4 @@
 use crate::{cli, db::{self, Page, Code, Specials}, utils};
-use std::io::Write;
 
 pub async fn pages(hash:&str){
     bunt::println!("Currently in Page: {$cyan}{}{/$}", hash);
@@ -254,31 +253,6 @@ pub async fn set(thing:&str){
     else{
         bunt::println!("{$red}Aborted{/$}");
     }
-}
-
-pub async fn md(hash:&str){
-    bunt::println!("New Markdown File");
-    let md_url = utils::get_md_url();
-    let md_path = format!("{}\\{}.mdx", md_url, hash);
-    let mut file = std::fs::File::create(md_path).expect("Unable to create file");
-    let title = cli::get_text("Title", "Title of the post");
-    let date = cli::get_text("Date", "Date of the post");
-    let author = "Ishan".to_string();
-    let emoji = cli::get_text("Emoji", "Emoji of the post");
-    let category = cli::get_text("Category", "Category of the post");
-    let tags = cli::get_text("Tags", "Tags of the post");
-    let post_type = cli::get_text("Type", "Type of the post");
-    let bg = inquire::Text::new("Bg of the post").with_default("#fff").prompt().unwrap();
-    let fg = inquire::Text::new("Fg of the post").with_default("#000").prompt().unwrap();
-    let selection_color = inquire::Text::new("Selection Color of the post").with_default("#fff").prompt().unwrap();
-    let selection_bg = inquire::Text::new("Code Bg of the post").with_default("#000").prompt().unwrap();
-    let full_img = inquire::Text::new("Full Image").with_default("false").prompt().unwrap();
-    let full_img = full_img.parse::<bool>().unwrap();
-    let full_img = full_img.to_string();
-
-    let content = format!("---\ntitle: {}\ndate: {}\nauthor: {}\nemoji: {}\nlayout: '../../../layouts/blog_post.astro'\ncategory: {}\ntags: {}\ntype: {}\nbg: {}\nfg: {}\nselection_color: {}\nselection_bg: {}\nfull_img: {}\n---\n", title, date, author, emoji, category, tags, post_type, bg, fg, selection_color, selection_bg, full_img);
-    file.write_all(content.as_bytes()).expect("Unable to write data");
-    bunt::println!("Created {$green}{}{/$}", title);
 }
 
 //check website speed

@@ -7,11 +7,6 @@ pub fn get_mongo_url()->String{
     mongo_url
 }
 
-pub fn get_md_url()->String{
-    let path = "C:\\Users\\joshi\\Projects\\About_astro_new\\src\\content\\blog\\drafts";
-    path.to_string()
-}
-
 pub fn title_to_hash(title: &str)->String{
     let hash = title.to_lowercase().replace(" ", "-").to_lowercase();
     hash
@@ -33,10 +28,16 @@ pub fn match_lang(lang: &str)->String{
         "javascript" => String::from(".js"),
         "typescript" => String::from(".ts"),
         "c" => String::from(".c"),
+        "r" => String::from(".r"),
+        "jsx" => String::from(".jsx"),
+        "tsx" => String::from(".tsx"),
         "c++" => String::from(".cpp"),
         "c#" => String::from(".cs"),
         "go" => String::from(".go"),
         "java" => String::from(".java"),
+        // So weird, that the rust case is not working
+        // TODO: Open Issue on rust-lang/rust repo
+        "rustlang" => String::from(".rs"),
         "kotlin" => String::from(".kt"),
         "ruby" => String::from(".rb"),
         "php" => String::from(".php"),
@@ -49,4 +50,13 @@ pub fn match_lang(lang: &str)->String{
 pub fn copy(msg: &str){
     let mut board: ClipboardContext = ClipboardProvider::new().unwrap();
     board.set_contents(msg.to_owned()).unwrap();
+}
+
+pub fn print_splash_screen(){
+    bunt::println!("{$blue} _   _             _     _   _                 _ _           {/$}");
+    bunt::println!("{$yellow}| \\ | | ___   ___ | |__ | | | | __ _ _ __   __| | | ___ _ __ {/$}");
+    bunt::println!("{$red}|  \\| |/ _ \\ / _ \\| '_ \\| |_| |/ _` | '_ \\ / _` | |/ _ \\ '__|{/$}");
+    bunt::println!("{$yellow}| |\\  | (_) | (_) | |_) |  _  | (_| | | | | (_| | |  __/ |   {/$}");
+    bunt::println!("{$blue}|_| \\_|\\___/ \\___/|_.__/|_| |_|\\__,_|_| |_|\\__,_|_|\\___|_|   {/$}");
+    println!("\n");
 }
