@@ -13,6 +13,9 @@ struct Args {
 
     #[arg(required=false)]
     hash: Option<String>,
+
+    #[arg(required=false, short, long, help="The file you want to use")]
+    file: Option<String>
 }
 
 fn get_args()-> Args {
@@ -50,7 +53,7 @@ async fn main() {
     // We use the handle module to handle the different options
     match option.as_str() {
         "set" => handle::set(&hash).await,
-        "new" => handle::new(&hash).await,
+        "new" => handle::new(&hash, args.file).await,
         "list" => handle::list(&hash).await,
         "pages" => handle::pages(&hash).await,
         "code" => handle::code(&hash).await,

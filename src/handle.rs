@@ -109,9 +109,9 @@ pub async fn go(hash: &str){
     }   
 }
 
-pub async fn new_page(){
+pub async fn new_page(file: Option<String>){
     bunt::println!("Initializing New Page");
-    let page:Page = Page{
+    let mut page:Page = Page{
         _id: mongodb::bson::oid::ObjectId::new(),
         hash: String::from(""),
         name: String::from(""),
@@ -119,6 +119,18 @@ pub async fn new_page(){
         date: String::from(""),
         author: String::from(""),
     };
+    if file.is_some(){
+        let file = file.unwrap();
+        let file_exists = std::path::Path::new(&file).exists();
+        if !file_exists {
+            bunt::println!("{$red}File does not exist{/$}, skipping");
+        }
+        else{
+            let file_content = std::fs::read_to_string(file).unwrap();
+            page.content = file_content;
+            bunt::println!("{$green}File Pre Loaded{/$}")
+        }
+    }
     let mut edited_page = cli::ask_page(&page);
     bunt::println!("Edited Page: {$green}{}{/$}", edited_page.name);
     edited_page.hash = crate::utils::title_to_hash(&edited_page.name);
@@ -135,9 +147,9 @@ pub async fn new_page(){
     }
 }
 
-pub async fn new_code(){
+pub async fn new_code(file: Option<String>){
     bunt::println!("Initializing New Code");
-    let code:Code = Code{
+    let mut code:Code = Code{
         _id: mongodb::bson::oid::ObjectId::new(),
         hash: String::from(""),
         title: String::from(""),
@@ -145,6 +157,18 @@ pub async fn new_code(){
         lang: String::from(""),
         author: String::from(""),
     };
+    if file.is_some(){
+        let file = file.unwrap();
+        let file_exists = std::path::Path::new(&file).exists();
+        if !file_exists {
+            bunt::println!("{$red}File does not exist{/$}, skipping");
+        }
+        else{
+            let file_content = std::fs::read_to_string(file).unwrap();
+            code.content = file_content;
+            bunt::println!("{$green}File Pre Loaded{/$}")
+        }
+    }
     let mut edited_code = cli::ask_code(&code);
     bunt::println!("Initialized Page: {$green}{}{/$}", edited_code.title);
     edited_code.hash = crate::utils::random_hash();
@@ -176,13 +200,13 @@ pub async fn new_go(){
     }
 }
 
-pub async fn new(doc:&str){
+pub async fn new(doc:&str, file: Option<String>){
     match doc {
         "pages" => {
-            new_page().await;            
+            new_page(file).await;            
         },
         "code" => {
-            new_code().await;
+            new_code(file).await;
         }
         "go" => {
             new_go().await;
