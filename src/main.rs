@@ -26,7 +26,6 @@ fn get_args()-> Args {
 mod handle;
 mod cli;
 mod utils;
-mod connections;
 mod db;
 
 #[tokio::main]
