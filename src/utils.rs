@@ -3,13 +3,11 @@ use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
 
 pub fn get_mongo_url()->String{
-    let mongo_url = std::env::var("MONGODB_URL").expect("MONGODB_URL not set");
-    mongo_url
+    std::env::var("MONGODB_URL").expect("MONGODB_URL not set")
 }
 
 pub fn title_to_hash(title: &str)->String{
-    let hash = title.to_lowercase().replace(" ", "-").to_lowercase();
-    hash
+    title.to_lowercase().replace(' ', "-").to_lowercase()
 }
 
 pub fn random_hash()->String{

@@ -716,7 +716,7 @@ dependencies = [
 
 [[package]]
 name = "handler"
-version = "0.4.0"
+version = "0.5.0"
 dependencies = [
  "bunt",
  "clap",

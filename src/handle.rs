@@ -2,7 +2,7 @@ use crate::{cli, db::{self, Page, Code, Specials}, utils};
 
 pub async fn pages(hash:&str){
     bunt::println!("Currently in Page: {$cyan}{}{/$}", hash);
-    let page = db::get_page(&hash).await;
+    let page = db::get_page(hash).await;
     let option = cli::get_option(vec!["Show", "Edit", "Delete"]);
     match option.as_str() {
         "Show" => {
@@ -39,7 +39,7 @@ pub async fn pages(hash:&str){
 
 pub async fn code(hash: &str){
     bunt::println!("Currently in Code: {$cyan}{}{/$}", hash);
-    let code_doc = db::get_code(&hash).await;
+    let code_doc = db::get_code(hash).await;
     let option = cli::get_option(vec!["Show", "Edit", "Delete"]);
     match option.as_str() {
         "Show" => {
@@ -75,7 +75,7 @@ pub async fn code(hash: &str){
 
 pub async fn go(hash: &str){
     bunt::println!("Currently in Go: {$cyan}{}{/$}", hash);
-    let go_doc = db::get_go(&hash).await;
+    let go_doc = db::get_go(hash).await;
     let option = cli::get_option(vec!["Show", "Edit", "Delete"]);
     match option.as_str() {
         "Show" => {
@@ -283,15 +283,14 @@ pub async fn set(thing:&str){
 use reqwest::Client;
 use std::time::Instant;
 
-pub async fn speed(url: &str) -> () {
-    let final_url:String;
-    if url.starts_with("http://") || url.starts_with("https://") {
+pub async fn speed(url: &str) {
+    let final_url = if url.starts_with("http://") || url.starts_with("https://") {
         bunt::println!("Checking Speed of {$cyan}{}{/$}", url);
-        final_url = url.to_string();
+        url.to_string()
     } else {
         bunt::println!("Checking Speed of {$cyan}{}{/$}", format!("https://{}", url));
-        final_url = format!("https://{}", url).to_string();
-    }
+        format!("https://{}", url).to_string()
+    };
     let client = Client::new();
     let start = Instant::now();
     let res = client.get(final_url).send().await.unwrap();
