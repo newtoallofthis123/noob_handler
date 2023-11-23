@@ -27,9 +27,11 @@ mod handle;
 mod cli;
 mod utils;
 mod db;
+mod file;
 
 #[tokio::main]
 async fn main() {
+    file::change_to_config_path();
     // For automatically loading the .env file
     dotenv().ok();
     // For automatically setting up the panic handler
