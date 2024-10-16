@@ -12,7 +12,7 @@ struct Args {
     option: String,
 
     #[arg(required=false)]
-    hash: Option<String>,
+    iden: String,
 
     #[arg(required=false, short, long, help="The file you want to use")]
     file: Option<String>
@@ -42,23 +42,18 @@ async fn main() {
     let args = get_args();
     let option = args.option;
     // We check if the user has actually given the hash as an argument
-    let hash = if args.hash.is_some() {
-        args.hash.unwrap()
-    } else {
-        // I don't like to impose arguments on the user, so we ask for the hash if it is not given
-        cli::get_text("Page Hash", "Enter The Hash of the page you want to edit")
-    };
+    let iden = args.iden;
     // We match the option given by the user and call the appropriate function
     // Match functions rock in Rust
     // We use the handle module to handle the different options
     match option.as_str() {
-        "set" => handle::set(&hash).await,
-        "new" => handle::new(&hash, args.file).await,
-        "list" => handle::list(&hash).await,
-        "pages" => handle::pages(&hash).await,
-        "code" => handle::code(&hash).await,
-        "go" => handle::go(&hash).await,
-        "speed" => handle::speed(&hash).await,
+        "set" => handle::set(&iden).await,
+        "new" => handle::new(&iden, args.file).await,
+        "list" => handle::list(&iden).await,
+        "pages" => handle::pages(&iden).await,
+        "code" => handle::code(&iden).await,
+        "go" => handle::go(&iden).await,
+        "speed" => handle::speed(&iden).await,
         _ => println!("Invalid Option"),
     }
 }
