@@ -1,6 +1,6 @@
 use std::path::Path;
 
-pub fn change_to_config_path(){
+pub fn change_to_config_path() {
     let platform = match std::env::consts::OS {
         "windows" => "USERPROFILE",
         "linux" => "HOME",

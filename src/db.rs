@@ -1,8 +1,8 @@
-use futures::StreamExt;
-use mongodb::{Client, bson::doc, options::FindOptions};
-use serde::{Deserialize, Serialize};
 use crate::utils::get_mongo_url;
+use futures::StreamExt;
 use mongodb::bson::oid::ObjectId;
+use mongodb::{bson::doc, options::FindOptions, Client};
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Go {
@@ -12,7 +12,7 @@ pub struct Go {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Page{
+pub struct Page {
     pub _id: ObjectId,
     pub hash: String,
     pub name: String,
@@ -22,7 +22,7 @@ pub struct Page{
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Code{
+pub struct Code {
     pub _id: ObjectId,
     pub hash: String,
     pub title: String,
@@ -32,7 +32,7 @@ pub struct Code{
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct Specials{
+pub struct Specials {
     pub _id: ObjectId,
     pub tag: String,
     pub title: String,
@@ -57,112 +57,151 @@ async fn get_page_conn() -> mongodb::Collection<Page> {
     db.collection::<Page>("page")
 }
 
-async fn get_code_conn()->mongodb::Collection<Code>{
+async fn get_code_conn() -> mongodb::Collection<Code> {
     let db = get_db().await.unwrap();
     db.collection::<Code>("code")
 }
 
-async fn get_go_conn()->mongodb::Collection<Go>{
+async fn get_go_conn() -> mongodb::Collection<Go> {
     let db = get_db().await.unwrap();
     db.collection::<Go>("go")
 }
 
-async fn get_specials_conn()->mongodb::Collection<Specials>{
+async fn get_specials_conn() -> mongodb::Collection<Specials> {
     let db = get_db().await.unwrap();
     db.collection::<Specials>("specials")
 }
 
-pub async fn get_page(hash: &str)->Page{
+pub async fn get_page(hash: &str) -> Page {
     let collection = get_page_conn().await;
-    let result = collection.find_one(doc! {"hash": hash}, None).await.unwrap();
+    let result = collection
+        .find_one(doc! {"hash": hash}, None)
+        .await
+        .unwrap();
     result.expect("Page Not Found")
 }
 
-pub async fn update_page(hash: &str, page:&Page)->mongodb::results::UpdateResult{
+pub async fn update_page(hash: &str, page: &Page) -> mongodb::results::UpdateResult {
     let collection = get_page_conn().await;
-    
-    collection.update_one(doc! {"hash": hash}, doc! {"$set": 
-        {
-            "name": &page.name,
-            "content": &page.content,
-            "date": &page.date,
-            "author": &page.author,
-        }
-}, None).await.unwrap()
+
+    collection
+        .update_one(
+            doc! {"hash": hash},
+            doc! {"$set":
+                    {
+                        "name": &page.name,
+                        "content": &page.content,
+                        "date": &page.date,
+                        "author": &page.author,
+                    }
+            },
+            None,
+        )
+        .await
+        .unwrap()
 }
 
-pub async fn insert_page(page:&Page)->mongodb::results::InsertOneResult{
+pub async fn insert_page(page: &Page) -> mongodb::results::InsertOneResult {
     let collection = get_page_conn().await;
-    
+
     collection.insert_one(page.clone(), None).await.unwrap()
 }
 
-pub async fn delete_page(hash: &str)->mongodb::results::DeleteResult{
+pub async fn delete_page(hash: &str) -> mongodb::results::DeleteResult {
     let collection = get_page_conn().await;
-    
-    collection.delete_one(doc! {"hash": hash}, None).await.unwrap()
+
+    collection
+        .delete_one(doc! {"hash": hash}, None)
+        .await
+        .unwrap()
 }
 
-pub async fn get_code(hash: &str)->Code{
+pub async fn get_code(hash: &str) -> Code {
     let collection = get_code_conn().await;
-    let result = collection.find_one(doc! {"hash": hash}, None).await.unwrap();
+    let result = collection
+        .find_one(doc! {"hash": hash}, None)
+        .await
+        .unwrap();
     result.expect("Code Not Found")
 }
 
-pub async fn update_code(hash: &str, code:&Code)->mongodb::results::UpdateResult{
+pub async fn update_code(hash: &str, code: &Code) -> mongodb::results::UpdateResult {
     let collection = get_code_conn().await;
-    
-    collection.update_one(doc! {"hash": hash}, doc! {"$set": 
-        {
-            "title": &code.title,
-            "content": &code.content,
-            "lang": &code.lang,
-            "author": &code.author,
-        }
-}, None).await.unwrap()
+
+    collection
+        .update_one(
+            doc! {"hash": hash},
+            doc! {"$set":
+                    {
+                        "title": &code.title,
+                        "content": &code.content,
+                        "lang": &code.lang,
+                        "author": &code.author,
+                    }
+            },
+            None,
+        )
+        .await
+        .unwrap()
 }
 
-pub async fn insert_code(code:&Code)->mongodb::results::InsertOneResult{
+pub async fn insert_code(code: &Code) -> mongodb::results::InsertOneResult {
     let collection = get_code_conn().await;
-    
+
     collection.insert_one(code.clone(), None).await.unwrap()
 }
 
-pub async fn delete_code(hash: &str)->mongodb::results::DeleteResult{
+pub async fn delete_code(hash: &str) -> mongodb::results::DeleteResult {
     let collection = get_code_conn().await;
-    
-    collection.delete_one(doc! {"hash": hash}, None).await.unwrap()
+
+    collection
+        .delete_one(doc! {"hash": hash}, None)
+        .await
+        .unwrap()
 }
 
-pub async fn get_go(slug: &str)->Go{
+pub async fn get_go(slug: &str) -> Go {
     let collection = get_go_conn().await;
-    let result = collection.find_one(doc! {"slug": slug}, None).await.unwrap();
+    let result = collection
+        .find_one(doc! {"slug": slug}, None)
+        .await
+        .unwrap();
     result.unwrap()
 }
 
-pub async fn update_go(slug: &str, go:&Go)->mongodb::results::UpdateResult{
+pub async fn update_go(slug: &str, go: &Go) -> mongodb::results::UpdateResult {
     let collection = get_go_conn().await;
-    
-    collection.update_one(doc! {"slug": slug}, doc! {"$set": 
-        {
-            "url": &go.url,
-        }
-}, None).await.unwrap()
+
+    collection
+        .update_one(
+            doc! {"slug": slug},
+            doc! {"$set":
+                    {
+                        "url": &go.url,
+                    }
+            },
+            None,
+        )
+        .await
+        .unwrap()
 }
 
-pub async fn insert_go(go:&Go)->mongodb::results::InsertOneResult{
+pub async fn insert_go(go: &Go) -> mongodb::results::InsertOneResult {
     let collection = get_go_conn().await;
-    
+
     collection.insert_one(go.clone(), None).await.unwrap()
 }
 
-pub async fn delete_go(slug: &str)->mongodb::results::DeleteResult{
+pub async fn delete_go(slug: &str) -> mongodb::results::DeleteResult {
     let collection = get_go_conn().await;
-    
-    collection.delete_one(doc! {"slug": slug}, None).await.unwrap()
+
+    collection
+        .delete_one(doc! {"slug": slug}, None)
+        .await
+        .unwrap()
 }
 
-pub async fn get_all_pages()->Vec<Page>{
+pub async fn get_all_pages() -> Vec<Page> {
     let collection = get_page_conn().await;
     let find_options = FindOptions::builder().build();
     let mut result = collection.find(None, find_options).await.unwrap();
@@ -173,7 +212,7 @@ pub async fn get_all_pages()->Vec<Page>{
     result_vec
 }
 
-pub async fn get_all_codes()->Vec<Code>{
+pub async fn get_all_codes() -> Vec<Code> {
     let collection = get_code_conn().await;
     let find_options = FindOptions::builder().build();
     let mut result = collection.find(None, find_options).await.unwrap();
@@ -184,7 +223,7 @@ pub async fn get_all_codes()->Vec<Code>{
     result_vec
 }
 
-pub async fn _get_all_go()->Vec<Go>{
+pub async fn _get_all_go() -> Vec<Go> {
     let collection = get_go_conn().await;
     let find_options = FindOptions::builder().build();
     let mut result = collection.find(None, find_options).await.unwrap();
@@ -195,21 +234,31 @@ pub async fn _get_all_go()->Vec<Go>{
     result_vec
 }
 
-pub async fn get_specials()->Specials{
+pub async fn get_specials() -> Specials {
     let collection = get_specials_conn().await;
-    let result = collection.find_one(doc! {"tag": "special"}, None).await.unwrap();
+    let result = collection
+        .find_one(doc! {"tag": "special"}, None)
+        .await
+        .unwrap();
     result.expect("Specials Not Found")
 }
 
-pub async fn set_specials(special:&Specials)->mongodb::results::UpdateResult{
+pub async fn set_specials(special: &Specials) -> mongodb::results::UpdateResult {
     let collection = get_specials_conn().await;
-    
-    collection.update_one(doc! {"tag": "special"}, doc! {"$set": 
-        {
-            "title": &special.title,
-            "description": &special.description,
-            "current": &special.current,
-            "date": &special.date,
-        }
-}, None).await.unwrap()
+
+    collection
+        .update_one(
+            doc! {"tag": "special"},
+            doc! {"$set":
+                    {
+                        "title": &special.title,
+                        "description": &special.description,
+                        "current": &special.current,
+                        "date": &special.date,
+                    }
+            },
+            None,
+        )
+        .await
+        .unwrap()
 }

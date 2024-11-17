@@ -8,26 +8,26 @@ use human_panic::setup_panic;
 
 // The Args struct is used to parse the command line arguments
 struct Args {
-    #[arg(required=true, help="The option you want to use")]
+    #[arg(required = true, help = "The option you want to use")]
     option: String,
 
-    #[arg(required=false)]
+    #[arg(required = false)]
     iden: String,
 
-    #[arg(required=false, short, long, help="The file you want to use")]
-    file: Option<String>
+    #[arg(required = false, short, long, help = "The file you want to use")]
+    file: Option<String>,
 }
 
-fn get_args()-> Args {
+fn get_args() -> Args {
     Args::parse()
 }
 
 //? Mod Definitions
-mod handle;
 mod cli;
-mod utils;
 mod db;
 mod file;
+mod handle;
+mod utils;
 
 #[tokio::main]
 async fn main() {

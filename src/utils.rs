@@ -1,16 +1,16 @@
-use rand::Rng;
-use clipboard::ClipboardProvider;
 use clipboard::ClipboardContext;
+use clipboard::ClipboardProvider;
+use rand::Rng;
 
-pub fn get_mongo_url()->String{
+pub fn get_mongo_url() -> String {
     std::env::var("MONGODB_URL").expect("MONGODB_URL not set")
 }
 
-pub fn title_to_hash(title: &str)->String{
+pub fn title_to_hash(title: &str) -> String {
     title.to_lowercase().replace(' ', "-").to_lowercase()
 }
 
-pub fn random_hash()->String{
+pub fn random_hash() -> String {
     let mut rng = rand::thread_rng();
     let rand_string: String = std::iter::repeat(())
         .map(|()| rng.sample(rand::distributions::Alphanumeric) as char)
@@ -19,8 +19,8 @@ pub fn random_hash()->String{
     rand_string
 }
 
-pub fn match_lang(lang: &str)->String{
-    match lang{
+pub fn match_lang(lang: &str) -> String {
+    match lang {
         "python" => String::from(".py"),
         "rust" => String::from(".rs"),
         "javascript" => String::from(".js"),
@@ -45,16 +45,18 @@ pub fn match_lang(lang: &str)->String{
     }
 }
 
-pub fn copy(msg: &str){
+pub fn copy(msg: &str) {
     let mut board: ClipboardContext = ClipboardProvider::new().unwrap();
     board.set_contents(msg.to_owned()).unwrap();
 }
 
-pub fn print_splash_screen(){
+pub fn print_splash_screen() {
     bunt::println!("{$blue} _   _             _     _   _                 _ _           {/$}");
     bunt::println!("{$yellow}| \\ | | ___   ___ | |__ | | | | __ _ _ __   __| | | ___ _ __ {/$}");
     bunt::println!("{$red}|  \\| |/ _ \\ / _ \\| '_ \\| |_| |/ _` | '_ \\ / _` | |/ _ \\ '__|{/$}");
     bunt::println!("{$yellow}| |\\  | (_) | (_) | |_) |  _  | (_| | | | | (_| | |  __/ |   {/$}");
-    bunt::println!("{$blue}|_| \\_|\\___/ \\___/|_.__/|_| |_|\\__,_|_| |_|\\__,_|_|\\___|_|   {/$}");
+    bunt::println!(
+        "{$blue}|_| \\_|\\___/ \\___/|_.__/|_| |_|\\__,_|_| |_|\\__,_|_|\\___|_|   {/$}"
+    );
     println!("\n");
 }
